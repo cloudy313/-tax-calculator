@@ -3,7 +3,6 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>領収書計算</title>
 
 <style>
@@ -49,8 +48,13 @@ button{
     border-radius:12px;
 }
 
+.calc-btn{
+    background:#ff7a00;
+    color:white;
+}
+
 .clear-btn{
-    background:#777;
+    background:#18a558;
     color:white;
 }
 
@@ -101,14 +105,23 @@ button{
     id="price"
     type="number"
     placeholder="税込金額を入力"
-    oninput="calc()"
     onclick="this.select()"
     onfocus="this.select()">
 
 <div class="button-group">
-    <button class="clear-btn" onclick="clearForm()">
+
+    <button
+        class="calc-btn"
+        onclick="calc()">
+        計算
+    </button>
+
+    <button
+        class="clear-btn"
+        onclick="clearForm()">
         クリア
     </button>
+
 </div>
 
 <div class="result">
@@ -181,6 +194,8 @@ function calc(){
         document.getElementById("excludedRaw").textContent = "";
         document.getElementById("taxRaw").textContent = "";
     }
+
+    document.activeElement.blur();
 }
 
 function clearForm(){
