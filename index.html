@@ -3,12 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>領収書計算</title>
+<title>インボイス計算</title>
 
 <style>
 body{
-    background:#e5e5e5;
-    font-family:sans-serif;
+    background:#f3f1ed;
+    font-family:-apple-system,BlinkMacSystemFont,sans-serif;
     margin:0;
     padding:20px;
 }
@@ -20,7 +20,8 @@ body{
 
 h1{
     text-align:center;
-    color:#ff7a00;
+    color:#5a2d0c;
+    font-weight:700;
 }
 
 input{
@@ -31,6 +32,7 @@ input{
     text-align:center;
     border:none;
     border-radius:12px;
+    background:white;
 }
 
 .button-group{
@@ -49,12 +51,12 @@ button{
 }
 
 .calc-btn{
-    background:#ff7a00;
+    background:#5a2d0c;
     color:white;
 }
 
 .clear-btn{
-    background:#18a558;
+    background:#5f6368;
     color:white;
 }
 
@@ -63,6 +65,7 @@ button{
     background:white;
     border-radius:12px;
     padding:20px;
+    box-shadow:0 2px 8px rgba(0,0,0,0.08);
 }
 
 .item{
@@ -80,17 +83,11 @@ button{
 }
 
 .total{
-    color:#ff7a00;
+    color:#5a2d0c;
 }
 
 .tax{
-    color:#18a558;
-}
-
-.detail{
-    font-size:14px;
-    color:#888;
-    margin-top:5px;
+    color:#444;
 }
 </style>
 </head>
@@ -99,7 +96,7 @@ button{
 
 <div class="container">
 
-<h1>領収書計算</h1>
+<h1>インボイス計算</h1>
 
 <input
     id="price"
@@ -134,13 +131,11 @@ button{
     <div class="item">
         <div class="label">税抜金額</div>
         <div class="value" id="excluded">-</div>
-        <div class="detail" id="excludedRaw"></div>
     </div>
 
     <div class="item">
         <div class="label">消費税（10%）</div>
         <div class="value tax" id="tax">-</div>
-        <div class="detail" id="taxRaw"></div>
     </div>
 
 </div>
@@ -162,11 +157,11 @@ function calc(){
         return;
     }
 
-    const excludedRaw = included / 1.1;
-    const taxRaw = included - excludedRaw;
+    const excluded =
+        Math.round(included / 1.1);
 
-    const excluded = Math.round(excludedRaw);
-    const tax = Math.round(taxRaw);
+    const tax =
+        Math.round(included - (included / 1.1));
 
     document.getElementById("included").textContent =
         yen(included);
@@ -176,24 +171,6 @@ function calc(){
 
     document.getElementById("tax").textContent =
         yen(tax);
-
-    const hasDecimal =
-        Math.abs(excludedRaw - Math.round(excludedRaw)) > 0.001 ||
-        Math.abs(taxRaw - Math.round(taxRaw)) > 0.001;
-
-    if(hasDecimal){
-
-        document.getElementById("excludedRaw").textContent =
-            "計算値: " + excludedRaw.toFixed(2) + "円";
-
-        document.getElementById("taxRaw").textContent =
-            "計算値: " + taxRaw.toFixed(2) + "円";
-
-    }else{
-
-        document.getElementById("excludedRaw").textContent = "";
-        document.getElementById("taxRaw").textContent = "";
-    }
 
     document.activeElement.blur();
 }
@@ -205,9 +182,6 @@ function clearForm(){
     document.getElementById("included").textContent = "-";
     document.getElementById("excluded").textContent = "-";
     document.getElementById("tax").textContent = "-";
-
-    document.getElementById("excludedRaw").textContent = "";
-    document.getElementById("taxRaw").textContent = "";
 
     document.getElementById("price").focus();
 }
