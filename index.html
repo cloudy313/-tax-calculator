@@ -1,126 +1,192 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>インボイス計算</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>インボイス計算</title>
 
-  <style>
-    body {
-      margin: 0;
-      background: #e9e9e9;
-      font-family: "Courier New", monospace;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-    }
+<style>
+body{
+    background:#f3f1ed;
+    font-family:-apple-system,BlinkMacSystemFont,sans-serif;
+    margin:0;
+    padding:20px;
+}
 
-    .receipt {
-      width: 320px;
-      background: #fff;
-      padding: 20px;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-      border-radius: 8px;
-    }
+.container{
+    max-width:500px;
+    margin:auto;
+}
 
-    .title {
-      text-align: center;
-      font-size: 18px;
-      font-weight: bold;
-      margin-bottom: 10px;
-    }
+h1{
+    text-align:center;
+    color:#5a2d0c;
+    font-weight:700;
+}
 
-    .line {
-      border-top: 1px dashed #999;
-      margin: 10px 0;
-    }
+input{
+    width:100%;
+    box-sizing:border-box;
+    padding:18px;
+    font-size:32px;
+    text-align:center;
+    border:none;
+    border-radius:12px;
+    background:white;
+}
 
-    input {
-      width: 100%;
-      padding: 10px;
-      font-size: 16px;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      text-align: right;
-      font-family: inherit;
-    }
+.button-group{
+    display:flex;
+    gap:10px;
+    margin-top:15px;
+}
 
-    button {
-      width: 100%;
-      margin-top: 10px;
-      padding: 10px;
-      font-size: 15px;
-      background: #000;
-      color: #fff;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-    }
+button{
+    flex:1;
+    padding:15px;
+    font-size:20px;
+    font-weight:bold;
+    border:none;
+    border-radius:12px;
+}
 
-    .result {
-      margin-top: 15px;
-      font-size: 14px;
-      line-height: 1.8;
-      white-space: pre-line;
-    }
+.calc-btn{
+    background:#5a2d0c;
+    color:white;
+}
 
-    .total {
-      font-size: 18px;
-      font-weight: bold;
-    }
+.clear-btn{
+    background:#5f6368;
+    color:white;
+}
 
-    .small {
-      font-size: 12px;
-      color: #666;
-    }
-  </style>
+.result{
+    margin-top:20px;
+    background:white;
+    border-radius:12px;
+    padding:20px;
+    box-shadow:0 2px 8px rgba(0,0,0,0.08);
+}
+
+.item{
+    margin:25px 0;
+}
+
+.label{
+    font-size:18px;
+    color:#666;
+}
+
+.value{
+    font-size:36px;
+    font-weight:bold;
+}
+
+.total{
+    color:#5a2d0c;
+}
+
+.tax{
+    color:#444;
+}
+</style>
 </head>
 
 <body>
 
-  <div class="receipt">
-    <div class="title">インボイス計算</div>
+<div class="container">
 
-    <input type="number" id="price" placeholder="¥ 金額を入力">
+<h1>インボイス計算</h1>
 
-    <button onclick="calcTax()">計算</button>
+<input
+    id="price"
+    type="number"
+    placeholder="税込金額を入力"
+    onclick="this.select()"
+    onfocus="this.select()">
 
-    <div class="line"></div>
+<div class="button-group">
 
-    <div class="result" id="result"></div>
-  </div>
+    <button
+        class="calc-btn"
+        onclick="calc()">
+        計算
+    </button>
 
-  <script>
-    function calcTax() {
-      const price = Number(document.getElementById("price").value);
-      const taxRate = 0.1;
+    <button
+        class="clear-btn"
+        onclick="clearForm()">
+        クリア
+    </button>
 
-      if (!price) {
-        document.getElementById("result").innerHTML = "金額を入力してください";
+</div>
+
+<div class="result">
+
+    <div class="item">
+        <div class="label">税込金額</div>
+        <div class="value total" id="included">-</div>
+    </div>
+
+    <div class="item">
+        <div class="label">税抜金額</div>
+        <div class="value" id="excluded">-</div>
+    </div>
+
+    <div class="item">
+        <div class="label">消費税（10%）</div>
+        <div class="value tax" id="tax">-</div>
+    </div>
+
+</div>
+
+</div>
+
+<script>
+
+function yen(num){
+    return num.toLocaleString() + "円";
+}
+
+function calc(){
+
+    const included =
+        Number(document.getElementById("price").value);
+
+    if(!included){
         return;
-      }
-
-      const rawTax = price * taxRate;
-      const tax = Math.floor(rawTax);
-      const total = price + tax;
-      const hasRemainder = rawTax !== tax;
-
-      let text = "";
-
-      text += `税抜金額　　¥${price.toLocaleString()}\n`;
-      text += `消費税　　　¥${tax.toLocaleString()}\n`;
-      text += `税込金額　　¥${total.toLocaleString()}\n`;
-
-      if (hasRemainder) {
-        text += `\n--- 明細 ---\n`;
-        text += `計算税額　　¥${rawTax.toFixed(2)}\n`;
-        text += `端数　　　　${(rawTax - tax).toFixed(2)}`;
-      }
-
-      document.getElementById("result").innerText = text;
     }
-  </script>
+
+    const excluded =
+        Math.round(included / 1.1);
+
+    const tax =
+        Math.round(included - (included / 1.1));
+
+    document.getElementById("included").textContent =
+        yen(included);
+
+    document.getElementById("excluded").textContent =
+        yen(excluded);
+
+    document.getElementById("tax").textContent =
+        yen(tax);
+
+    document.activeElement.blur();
+}
+
+function clearForm(){
+
+    document.getElementById("price").value = "";
+
+    document.getElementById("included").textContent = "-";
+    document.getElementById("excluded").textContent = "-";
+    document.getElementById("tax").textContent = "-";
+
+    document.getElementById("price").focus();
+}
+
+</script>
 
 </body>
 </html>
