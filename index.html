@@ -107,15 +107,11 @@ button{
 
 <div class="button-group">
 
-    <button
-        class="calc-btn"
-        onclick="calc()">
+    <button class="calc-btn" onclick="calc()">
         計算
     </button>
 
-    <button
-        class="clear-btn"
-        onclick="clearForm()">
+    <button class="clear-btn" onclick="clearForm()">
         クリア
     </button>
 
@@ -138,6 +134,11 @@ button{
         <div class="value tax" id="tax">-</div>
     </div>
 
+    <div class="item" id="rawTaxWrap" style="display:none;">
+        <div class="label">計算税額（参考）</div>
+        <div class="value tax" id="rawTax">-</div>
+    </div>
+
 </div>
 
 </div>
@@ -157,11 +158,17 @@ function calc(){
         return;
     }
 
+    const rawExcluded =
+        included / 1.1;
+
     const excluded =
-        Math.round(included / 1.1);
+        Math.round(rawExcluded);
 
     const tax =
-        Math.round(included - (included / 1.1));
+        Math.round(included - rawExcluded);
+
+    const hasRemainder =
+        Math.abs(rawExcluded - excluded) > 0.0001;
 
     document.getElementById("included").textContent =
         yen(included);
@@ -171,6 +178,14 @@ function calc(){
 
     document.getElementById("tax").textContent =
         yen(tax);
+
+    if(hasRemainder){
+        document.getElementById("rawTaxWrap").style.display = "block";
+        document.getElementById("rawTax").textContent =
+            (included - rawExcluded).toFixed(2) + "円";
+    } else {
+        document.getElementById("rawTaxWrap").style.display = "none";
+    }
 
     document.activeElement.blur();
 }
@@ -183,6 +198,7 @@ function clearForm(){
     document.getElementById("excluded").textContent = "-";
     document.getElementById("tax").textContent = "-";
 
+    document.getElementById("rawTaxWrap").style.display = "none";
     document.getElementById("price").focus();
 }
 
