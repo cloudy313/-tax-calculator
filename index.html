@@ -89,6 +89,12 @@ button{
 .tax{
     color:#444;
 }
+
+.small{
+    font-size:12px;
+    color:#888;
+    margin-top:5px;
+}
 </style>
 </head>
 
@@ -132,11 +138,10 @@ button{
     <div class="item">
         <div class="label">消費税（10%）</div>
         <div class="value tax" id="tax">-</div>
-    </div>
 
-    <div class="item" id="rawTaxWrap" style="display:none;">
-        <div class="label">計算税額（参考）</div>
-        <div class="value tax" id="rawTax">-</div>
+        <div class="small" id="rawTaxWrap" style="display:none;">
+            計算値：<span id="rawTax">-</span>
+        </div>
     </div>
 
 </div>
@@ -158,14 +163,10 @@ function calc(){
         return;
     }
 
-    const rawExcluded =
-        included / 1.1;
+    const rawExcluded = included / 1.1;
 
-    const excluded =
-        Math.round(rawExcluded);
-
-    const tax =
-        Math.round(included - rawExcluded);
+    const excluded = Math.round(rawExcluded);
+    const tax = Math.round(included - rawExcluded);
 
     const hasRemainder =
         Math.abs(rawExcluded - excluded) > 0.0001;
